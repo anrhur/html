@@ -1,30 +1,21 @@
-Dimension by HTML5 UP
-html5up.net | @ajlkn
-Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+# 期末報告-個人簡介以及網路爬蟲
 
+## 頁面一 [自我介紹](https://anrhur.github.io/html/#)
 
-This is Dimension, a fun little one-pager with modal-ized (is that a word?) "pages"
-and a cool depth effect (click on a menu item to see what I mean). Simple, fully
-responsive, and kitted out with all the usual pre-styled elements you'd expect.
-Hope you dig it :)
+## 頁面二 網路爬蟲
 
-Demo images* courtesy of Unsplash, a radtastic collection of CC0 (public domain) images
-you can use for pretty much whatever.
+## 使用工具與套件
+1. github
+2. HTML
+3. CSS
+4. python
+5. selenium webdriver_manager
 
-(* = not included)
+## 要爬蟲的網站
+![image](https://github.com/user-attachments/assets/004fb59e-98a2-4052-95ea-37fc5b096573)
 
-AJ
-aj@lkn.io | @ajlkn
+[政府資料開放平台](https://data.gov.tw/)
 
-
-Credits:
-
-	Demo Images:
-		Unsplash (unsplash.com)
-
-	Icons:
-		Font Awesome (fontawesome.io)
-
-	Other:
-		jQuery (jquery.com)
-		Responsive Tools (github.com/ajlkn/responsive-tools)
+## 作者
+- 張祐廷
+- yo20050303@gmail.com
