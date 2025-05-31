@@ -42,8 +42,8 @@
 										<a href='https://data.gov.tw/'>政府公開資料平台</a>
 										<p>爬取的關鍵字為消防</p>
 										<h2 id="content">程式講解</h2>
-									        <a>載入selenium以及webdriver_manager
-套件</a>
+									        <h3>載入selenium以及webdriver_manager
+套件</h3>
 										<pre><code>from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -53,9 +53,9 @@ import pandas as pd
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
                                                                                  </code></pre>
-									<a>
+									<h3>
 										設定瀏覽器選項，並啟動瀏覽器
-									</a>
+									</h3>
 									         <pre><code>
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-blink-features=AutomationControlled")
@@ -64,11 +64,11 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 driver.get("https://data.gov.tw/")
 driver.maximize_window()
                                                                                  </code></pre>
-									<a>
+									<h3>
 										抓取搜尋欄的ID並用send_keys自動鍵入關鍵字(如果失敗則輸出:無法找到搜尋框，
 										請檢查 ID 是否變更，並關閉瀏覽器)，建立data_list列表用來存放等等抓取到的資料
 										
-									</a>
+									</h3>
 									         <pre><code>
 try:
     search_box = driver.find_element(By.ID, "searchbar-input")  # 確保 ID 正確
@@ -82,10 +82,10 @@ except NoSuchElementException:
 # 存放所有資料的列表
 data_list = []
                                                                                  </code></pre>
-									<a>
+									<h3>
 										先抓取網頁資料列表的CLASS_NAME，並在這個CLASS_NAME中抓取標題以及資料說明的CLASS_NAME，
 										抓取出資料標題以及資料說明，如果失敗則輸出:無法獲取資料，請檢查 CSS 選擇器
-									</a>
+									</h3>
 									         <pre><code>
 # 定義抓取一頁資料的函式
 def extract_page_data():
@@ -102,9 +102,9 @@ def extract_page_data():
     except NoSuchElementException:
         print("無法獲取資料，請檢查 CSS 選擇器")
                                                                                  </code></pre>
-									         <a>
+									         <h3>
 											 設定要抓取的頁數，利用網頁中的下一頁按鈕的CSS來讓程式自動點擊
-										 </a>
+										 </h3>
 									         <pre><code>											
 # 迴圈抓多頁
 count = 0
@@ -121,9 +121,9 @@ while count < 3:
         break
     count += 1
                                                                                         </code></pre>
-									                <a>
+									                <h3>
 												抓取結束後關閉瀏覽器，並將抓取到的資料匯出成csv檔
-											</a>
+											</h3>
 									                <code><pre>
 # 結束瀏覽器
 driver.quit()
