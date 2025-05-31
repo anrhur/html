@@ -7,7 +7,7 @@
 -->
 <html>
 	<head>
-		<title>Elements - Editorial by HTML5 UP</title>
+		<title>網路爬蟲報告</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -42,6 +42,8 @@
 										<a href='https://data.gov.tw/'>政府公開資料平台</a>
 										<p>爬取的關鍵字為消防</p>
 										<h2 id="content">程式講解</h2>
+									        <a>載入selenium以及webdriver_manager
+套件</a>
 										<pre><code>from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -52,9 +54,94 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
                                                                                  </code></pre>
 									<a>
-										載入套件
+										設定瀏覽器選項，並啟動瀏覽器
 									</a>
 									         <pre><code>
+options = webdriver.ChromeOptions()
+options.add_argument("--disable-blink-features=AutomationControlled")
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver.get("https://data.gov.tw/")
+driver.maximize_window()
+                                                                                 </code></pre>
+									<a>
+										抓取搜尋欄的ID並用send_keys自動鍵入關鍵字(如果失敗則輸出:無法找到搜尋框，
+										請檢查 ID 是否變更，並關閉瀏覽器)，建立data_list列表用來存放等等抓取到的資料
+										
+									</a>
+									         <pre><code>
+try:
+    search_box = driver.find_element(By.ID, "searchbar-input")  # 確保 ID 正確
+    search_box.send_keys("消防")
+    search_box.send_keys(Keys.ENTER)
+except NoSuchElementException:
+    print("無法找到搜尋框，請檢查 ID 是否變更")
+    driver.quit()
+    exit()
+
+# 存放所有資料的列表
+data_list = []
+                                                                                 </code></pre>
+									<a>
+										先抓取網頁資料列表的CLASS_NAME，並在這個CLASS_NAME中抓取標題以及資料說明的CLASS_NAME，
+										抓取出資料標題以及資料說明，如果失敗則輸出:無法獲取資料，請檢查 CSS 選擇器
+									</a>
+									         <pre><code>
+# 定義抓取一頁資料的函式
+def extract_page_data():
+    time.sleep(1)
+    try:
+        items = driver.find_elements(By.CLASS_NAME, "dataset-item-left")  # 需確認正確的類名
+        for item in items:
+            title_element = item.find_element(By.CLASS_NAME, "dataset-title")  # 確保標題選擇正確
+            title = title_element.text.strip()
+            reftitle_element = item.find_element(By.CLASS_NAME, "dataset-content")  # 確保說明選擇正確
+            reftitle = reftitle_element.text.strip()
+            data_list.append({"標題": title, "說明": reftitle})
+            print(f"{title} ➡️ {reftitle}")
+    except NoSuchElementException:
+        print("無法獲取資料，請檢查 CSS 選擇器")
+                                                                                 </code></pre>
+									         <a>
+											 設定要抓取的頁數，利用網頁中的下一頁按鈕的CSS來讓程式自動點擊
+										 </a>
+									         <pre><code>											
+# 迴圈抓多頁
+count = 0
+while count < 3:
+    time.sleep(2)
+    extract_page_data()
+    try:
+        next_button = driver.find_element(By.CSS_SELECTOR, ".btn-next")
+        if next_button.is_enabled():
+            next_button.click()
+        else:
+            break  # 已經是最後一頁
+    except (NoSuchElementException, ElementNotInteractableException):
+        break
+    count += 1
+                                                                                        </code></pre>
+									                <a>
+												抓取結束後關閉瀏覽器，並將抓取到的資料匯出成csv檔
+											</a>
+									                <code><pre>
+# 結束瀏覽器
+driver.quit()
+df = pd.DataFrame(data_list)
+df.to_csv(r"data.csv" , index=False, encoding="utf-8-sig")
+print("資料成功保存至data.csv")
+											</code></pre>
+											
+										<h2 id="content">完整程式碼</h2>
+									        <code><pre>from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+import pandas as pd
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
+
 # 設定 Chrome 瀏覽器選項
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-blink-features=AutomationControlled")
@@ -76,11 +163,7 @@ except NoSuchElementException:
 
 # 存放所有資料的列表
 data_list = []
-                                                                                 </code></pre>
-									<a>
-										
-									</a>
-									         <pre><code>
+
 # 定義抓取一頁資料的函式
 def extract_page_data():
     time.sleep(1)
@@ -91,13 +174,11 @@ def extract_page_data():
             title = title_element.text.strip()
             reftitle_element = item.find_element(By.CLASS_NAME, "dataset-content")  # 確保說明選擇正確
             reftitle = reftitle_element.text.strip()
-            link = title_element.get_attribute("href")
             data_list.append({"標題": title, "說明": reftitle})
             print(f"{title} ➡️ {reftitle}")
     except NoSuchElementException:
         print("無法獲取資料，請檢查 CSS 選擇器")
-                                                                                 </code></pre>
-									         <pre><code>											
+
 # 迴圈抓多頁
 count = 0
 while count < 3:
@@ -112,18 +193,13 @@ while count < 3:
     except (NoSuchElementException, ElementNotInteractableException):
         break
     count += 1
-                                                                                        </code></pre>
-									                <code><pre>
+
 # 結束瀏覽器
 driver.quit()
 df = pd.DataFrame(data_list)
 df.to_csv(r"data.csv" , index=False, encoding="utf-8-sig")
 print("資料成功保存至data.csv")
 											</code></pre>
-											
-										<h2 id="content">遇到的問題</h2>
-										<p>目前遇到的問題是抓不到連結，以及每次只抓取每一頁的第一筆資料</p>
-										<span class="image main"><img src="images/code.png" alt="" /></span>
 									<hr class="major" />
 								</section>
 
